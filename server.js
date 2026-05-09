@@ -46,7 +46,8 @@ app.get('/projects', async (req, res) => {
     res.render('projects', { title });
 });
 
-app.get('/categories', (req, res) => {
+// To this (to match the other routes and requirements):
+app.get('/categories', async (req, res) => {
     const title = 'Service Project Categories';
     res.render('categories', { title });
 });
