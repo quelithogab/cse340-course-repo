@@ -1,3 +1,4 @@
+
 import { Pool } from 'pg';
 
 /**
@@ -13,7 +14,9 @@ import { Pool } from 'pg';
  */
 const pool = new Pool({
     connectionString: process.env.DB_URL,
-    ssl: true
+    ssl: {
+        rejectUnauthorized: false
+    }
 });
 
 /**
@@ -77,18 +80,10 @@ if (process.env.NODE_ENV === 'development' && process.env.ENABLE_SQL_LOGGING ===
 /**
  * Tests the database connection by executing a simple query.
  */
-/**
- * Tests the database connection by executing a simple query.
- */
 const testConnection = async() => {
     try {
         const result = await db.query('SELECT NOW() as current_time');
         console.log('Database connection successful:', result.rows[0].current_time);
-
-        // 🌟 FORCE NODE TO STAY ALIVE IN DEVELOPMENT MODE 🌟
-        // This keeps the event loop running so the server doesn't hit a "clean exit"
-        setInterval(() => {}, 1000 << 20); 
-        
         return true;
     } catch (error) {
         console.error('Database connection failed:', error.message);

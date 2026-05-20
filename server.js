@@ -40,29 +40,14 @@ app.get('/', async (req, res) => {
 });
 
 app.get('/organizations', async (req, res) => {
-    try {
-        // 1. Fetch the data array from your model function
-        const organizations = await getAllOrganizations();
-        
-        // 2. CRUCIAL: This satisfies your requirement to print to the console
-        console.log("--- Organizations Printed to Terminal Console ---");
-        console.log(organizations); 
-        console.log("-------------------------------------------------");
-          
-        const title = 'Our Partner Organizations';
-        
-        // 3. Pass BOTH variables to EJS so the webpage can read them
-        res.render('organizations', { title, organizations }); 
-    } catch (error) {
-        console.error("Route error:", error);
-        res.status(500).send("Internal Server Error");
-    }
+    const title = 'Our Partner Organizations';
+    res.render('organizations', { title });
 });
 
 app.get('/projects', async (req, res) => {
     const title = 'Service Projects';
     res.render('projects', { title });
-});
+}); 
 
 // To this (to match the other routes and requirements):
 app.get('/categories', async (req, res) => {
