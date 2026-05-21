@@ -52,7 +52,7 @@ nav ul li {
 }
 
 nav a {
-  color: var(--white);
+  color: var(--primary-color);
   text-decoration: none;
   font-weight: 600;
   transition: color 0.3s ease;
