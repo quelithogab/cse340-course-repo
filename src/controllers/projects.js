@@ -14,7 +14,11 @@ const showProjectsPage = async (req, res, next) => {
         const title = 'Upcoming Service Projects';
         const projects = await getUpcomingProjects(NUMBER_OF_UPCOMING_PROJECTS);
 
-        res.render('projects', { title, projects });
+        res.render('projects', { 
+            title, 
+            projects,
+            flash: req.flash() 
+        });
     } catch (err) {
         next(err);
     }
@@ -37,7 +41,8 @@ const showProjectDetailsPage = async (req, res, next) => {
         res.render('project', {
             title,
             project,
-            categories
+            categories,
+            flash: req.flash()
         });
     } catch (err) {
         next(err);

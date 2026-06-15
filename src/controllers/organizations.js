@@ -1,4 +1,8 @@
-import { getAllOrganizations, getOrganizationDetails, createOrganization } from '../models/organizations.js';
+import {
+    getAllOrganizations,
+    getOrganizationDetails,
+    createOrganization
+} from '../models/organizations.js';
 
 import { getProjectsByOrganizationId } from '../models/projects.js';
 
@@ -43,6 +47,25 @@ const showNewOrganizationForm = async (req, res) => {
     res.render('new-organization', { title });
 };
 
+const showEditOrganizationForm = async (req, res, next) => {
+    try {
+        const organizationId = req.params.id;
+        const organizationDetails = await getOrganizationDetails(organizationId);
+
+        if (!organizationDetails) {
+            const error = new Error('Organization not found');
+            error.status = 404;
+            return next(error);
+        }
+
+        const title = 'Edit Organization';
+
+        res.render('edit-organization', { title, organizationDetails });
+    } catch (err) {
+        next(err);
+    }
+};
+
 const createNewOrganization = async (req, res, next) => {
     try {
         const { name, description, contactEmail } = req.body;
@@ -55,6 +78,8 @@ const createNewOrganization = async (req, res, next) => {
             logoFilename
         );
 
+        req.flash('success', 'Organization added successfully!');
+
         res.redirect(`/organization/${organizationId}`);
     } catch (err) {
         next(err);
@@ -65,5 +90,6 @@ export {
     showOrganizationsPage,
     showOrganizationDetailsPage,
     showNewOrganizationForm,
+    showEditOrganizationForm,
     createNewOrganization
 };

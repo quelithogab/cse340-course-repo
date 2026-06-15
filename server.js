@@ -35,6 +35,9 @@ app.use(session({
     cookie: { maxAge: 60 * 60 * 1000 } // Session expires after 1 hour of inactivity
 }));
 
+// Use flash message middleware
+app.use(flash);
+
 // Serve static files from the public directory
 app.use(express.static(path.join(__dirname, 'public')));
 

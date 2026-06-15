@@ -15,3 +15,24 @@
             <li><a href="/categories">Categories</a></li>
         </ul>
     </nav>
+
+    <% if (typeof flash !== 'undefined') { %>
+        <% const messages = (typeof flash === 'function') ? flash() : flash; %>
+        <% if (messages && Object.keys(messages).length > 0) { %>
+            <div class="flash-messages">
+                <% Object.keys(messages).forEach(type => { %>
+                    <% if (Array.isArray(messages[type])) { %>
+                        <% messages[type].forEach(msg => { %>
+                            <div class="alert alert-<%= type %>">
+                                <%= msg %>
+                            </div>
+                        <% }); %>
+                    <% } else if (messages[type]) { %>
+                        <div class="alert alert-<%= type %>">
+                            <%= messages[type] %>
+                        </div>
+                    <% } %>
+                <% }); %>
+            </div>
+        <% } %>
+    <% } %>
