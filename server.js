@@ -38,6 +38,19 @@ app.use(session({
 // Use flash message middleware
 app.use(flash);
 
+// Make the signed-in user available to views
+app.use((req, res, next) => {
+    res.locals.isLoggedIn = false;
+    res.locals.isAdmin = false;
+    if (req.session && req.session.user) {
+        res.locals.isLoggedIn = true;
+        res.locals.isAdmin = req.session.user.role_name === 'admin';
+    }
+
+    res.locals.user = req.session.user || null;
+    next();
+});
+
 // Serve static files from the public directory
 app.use(express.static(path.join(__dirname, 'public')));
 
