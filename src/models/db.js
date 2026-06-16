@@ -11,13 +11,29 @@ import { Pool } from 'pg';
  */
 
 
-const pool = new Pool({
+const useSSL = process.env.DB_URL && process.env.DB_URL.includes('render.com');
+
+const createPool = () => new Pool({
     connectionString: process.env.DB_URL,
-    // CHANGED: Replaced 'ssl: true' to accept self-signed certificates in production
-    ssl: {
-        rejectUnauthorized: false
-    }
+    ssl: useSSL ? { rejectUnauthorized: false } : false,
+    connectionTimeoutMillis: 10000,
+    idleTimeoutMillis: 10000,
+    keepAlive: true,
+    max: 1,
+    maxUses: 1
 });
+
+let pool = createPool();
+
+const RETRYABLE_ERRORS = new Set([
+    'Connection terminated unexpectedly',
+    'terminating connection due to administrator command',
+    'ECONNRESET',
+    'ETIMEDOUT',
+    'socket hang up'
+]);
+
+const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 /**
  * Since we will modify the normal pool object in development mode, we need to create and
@@ -46,6 +62,20 @@ if (process.env.NODE_ENV === 'development' && process.env.ENABLE_SQL_LOGGING ===
                 });
                 return res;
             } catch (error) {
+                if (RETRYABLE_ERRORS.has(error.message) || RETRYABLE_ERRORS.has(error.code)) {
+                    await pool.end().catch(() => {});
+                    pool = createPool();
+                    await sleep(250);
+                    const start = Date.now();
+                    const res = await pool.query(text, params);
+                    const duration = Date.now() - start;
+                    console.log('Executed query after retry:', {
+                        text: text.replace(/\s+/g, ' ').trim(),
+                        duration: `${duration}ms`,
+                        rows: res.rowCount
+                    });
+                    return res;
+                }
                 console.error('Error in query:', { 
                     text: text.replace(/\s+/g, ' ').trim(), 
                     error: error.message 
