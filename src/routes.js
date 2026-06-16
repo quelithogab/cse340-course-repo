@@ -39,7 +39,8 @@ import {
     requireLogin,
     requireRole,
     showDashboard,
-    showAdminDashboard
+    showAdminDashboard,
+    showUsersPage
 } from './controllers/users.js';
 import { testErrorPage } from './controllers/errors.js';
 
@@ -74,6 +75,7 @@ router.post('/login', processLoginForm);
 router.get('/logout', processLogout);
 router.get('/dashboard', requireLogin, showDashboard);
 router.get('/admin', requireRole('admin'), showAdminDashboard);
+router.get('/users', requireRole('admin', '/dashboard', 'You must be an admin to view the users page.'), showUsersPage);
 router.get('/test-error', testErrorPage);
 
 // Route to handle new organization form submission
