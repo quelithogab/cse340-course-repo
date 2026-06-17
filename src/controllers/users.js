@@ -1,6 +1,7 @@
 import bcrypt from 'bcrypt';
 
 import { createUser, authenticateUser, getAllUsers } from '../models/users.js';
+import { getVolunteeredProjectsByUserId } from '../models/projects.js';
 
 const showUserRegistrationForm = (req, res) => {
     res.render('register', { title: 'Register', flash: req.flash() });
@@ -90,13 +91,20 @@ const requireRole = (roleName, redirectPath = '/', errorMessage = 'You do not ha
     };
 };
 
-const showDashboard = (req, res) => {
+const showDashboard = async (req, res, next) => {
     const user = req.session.user;
-    res.render('dashboard', {
-        title: 'Dashboard',
-        name: user.name,
-        email: user.email
-    });
+    try {
+        const volunteerProjects = await getVolunteeredProjectsByUserId(user.user_id);
+        res.render('dashboard', {
+            title: 'Dashboard',
+            name: user.name,
+            email: user.email,
+            volunteerProjects,
+            flash: req.flash()
+        });
+    } catch (error) {
+        next(error);
+    }
 };
 
 const showAdminDashboard = (req, res) => {

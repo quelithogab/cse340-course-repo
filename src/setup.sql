@@ -1,6 +1,8 @@
 BEGIN;
 
+DROP TABLE IF EXISTS project_volunteer;
 DROP TABLE IF EXISTS project_category;
+DROP TABLE IF EXISTS users;
 DROP TABLE IF EXISTS project;
 DROP TABLE IF EXISTS category;
 DROP TABLE IF EXISTS organization;
@@ -68,6 +70,15 @@ CREATE TABLE project (
     description TEXT,
     location VARCHAR(255),
     date DATE
+);
+
+-- ========================================
+-- PROJECT_VOLUNTEER JUNCTION TABLE
+-- ========================================
+CREATE TABLE project_volunteer (
+    project_id INTEGER NOT NULL REFERENCES project(project_id) ON DELETE CASCADE,
+    user_id INTEGER NOT NULL REFERENCES users(user_id) ON DELETE CASCADE,
+    PRIMARY KEY (project_id, user_id)
 );
 
 -- ========================================
